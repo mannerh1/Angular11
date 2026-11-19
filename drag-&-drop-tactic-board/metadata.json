@@ -1,0 +1,6 @@
+{
+  "name": "Drag & Drop Tactic Board",
+  "description": "Offline-first drag-and-drop tactical board PWA with resizable team tokens, tactical divider lines, and instant PNG export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

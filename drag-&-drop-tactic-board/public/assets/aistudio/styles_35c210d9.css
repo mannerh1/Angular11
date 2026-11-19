@@ -1,0 +1,506 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f5f7fa;
+}
+
+/* Left 1/4 outside panel with 3 layers separated by thin black lines */
+.outside-panel {
+  width: 25vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-right: 1px solid #000000;
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.panel-layer {
+  width: 100%;
+  min-width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem 1rem;
+}
+
+/* Thin black lines separating the 3 layers */
+.layer-top,
+.layer-middle {
+  border-bottom: 1px solid #000000;
+}
+
+/* Top Layer: Compact bold title + PWA/Unlock buttons */
+.layer-top {
+  padding: 1.15rem 1rem;
+  gap: 0.65rem;
+}
+
+.board-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2328;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pwa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.pwa-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.pay-btn {
+  background-color: #1565c0;
+  color: #ffffff;
+}
+
+.pay-btn:hover {
+  background-color: #0d47a1;
+}
+
+.pay-btn.unlocked {
+  background-color: #2e7d32;
+  color: #ffffff;
+}
+
+.install-btn {
+  background-color: #f0f4f8;
+  color: #1565c0;
+  border-color: #1565c0;
+}
+
+.install-btn:hover {
+  background-color: #e1ecf7;
+}
+
+/* Middle Layer (Rounds) and Bottom Layer (Lines) split remaining height evenly */
+.layer-middle {
+  flex: 1;
+  gap: 1.75rem;
+}
+
+.layer-bottom {
+  flex: 1;
+  gap: 1.75rem;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: 76px;
+}
+
+.circle-palette-group,
+.line-palette-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.count-label {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2328;
+  min-width: 2.5rem;
+}
+
+/* Right 3/4 blue rectangle tactical board */
+.blue-rectangle {
+  width: 75vw;
+  height: 100vh;
+  background-color: #1565c0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Circle styles & sizes: Small = 36px, Medium = 56px, Large = 76px */
+.circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 0;
+  margin: 0;
+  transition: width 0.15s ease, height 0.15s ease;
+}
+
+.circle.small {
+  width: 36px;
+  height: 36px;
+}
+
+.circle.medium {
+  width: 56px;
+  height: 56px;
+}
+
+.circle.large {
+  width: 76px;
+  height: 76px;
+}
+
+.circle.dragging {
+  cursor: grabbing;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  transition: none;
+}
+
+.circle.yellow {
+  background-color: #ffd600;
+}
+
+.circle.red {
+  background-color: #e53935;
+}
+
+.board-circle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+}
+
+.board-circle:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* Gray Line Template styles in Left Panel */
+.line-template {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.line-template.horizontal {
+  width: 80px;
+  height: 32px;
+}
+
+.line-template.vertical {
+  width: 56px;
+  height: 80px;
+}
+
+.line-template:focus-visible,
+.board-line:focus-visible {
+  outline: 2px dashed #ffffff;
+  outline-offset: 2px;
+}
+
+.line-bar {
+  background-color: #9e9e9e;
+  border-radius: 2px;
+  display: block;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Horizontal line thicknesses: Thin = 2px, Medium = 6px, Thick = 12px */
+.line-bar.horizontal {
+  width: 100%;
+}
+
+.line-bar.horizontal.thin {
+  height: 2px;
+}
+
+.line-bar.horizontal.medium {
+  height: 6px;
+}
+
+.line-bar.horizontal.thick {
+  height: 12px;
+}
+
+/* Vertical line thicknesses: Thin = 2px, Medium = 6px, Thick = 12px */
+.line-bar.vertical {
+  height: 100%;
+}
+
+.line-bar.vertical.thin {
+  width: 2px;
+}
+
+.line-bar.vertical.medium {
+  width: 6px;
+}
+
+.line-bar.vertical.thick {
+  width: 12px;
+}
+
+/* Radio buttons for Size (Small / Medium / Large) and Thickness (Thin / Medium / Thick) */
+.size-fieldset,
+.thickness-fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333b44;
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+  accent-color: #616161;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Board lines inside the blue rectangle (z-index: 10, below circles at z-index: 20) */
+.board-line {
+  position: absolute;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 10;
+}
+
+.board-line.dragging {
+  cursor: grabbing;
+  z-index: 15;
+}
+
+.board-line.outside-warning .line-bar {
+  opacity: 0.45;
+}
+
+/* Full width from left end to right end of the blue rectangle */
+.board-line.horizontal {
+  left: 0;
+  width: 100%;
+  height: 22px;
+  transform: translateY(-50%);
+}
+
+/* Full height from top to bottom of the blue rectangle */
+.board-line.vertical {
+  top: 0;
+  height: 100%;
+  width: 22px;
+  transform: translateX(-50%);
+}
+
+/* Floating drag elements */
+.floating-drag-circle {
+  position: fixed;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+}
+
+.floating-drag-line {
+  position: fixed;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-drag-line.horizontal {
+  width: 120px;
+  height: 22px;
+}
+
+.floating-drag-line.vertical {
+  width: 22px;
+  height: 120px;
+}
+
+/* Native Modal Dialog for $1.99 Unlock & PWA Installation */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(15, 23, 42, 0.55);
+}
+
+.paywall-dialog {
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 90vw;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  color: #1f2328;
+}
+
+.paywall-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.paywall-price {
+  margin: 0 0 0.85rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #1565c0;
+}
+
+.paywall-price-note {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #57606a;
+}
+
+.paywall-features {
+  margin: 0 0 1.1rem;
+  padding-left: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333b44;
+}
+
+.paywall-checkout-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.checkout-primary-btn {
+  background-color: #1565c0;
+  color: #ffffff;
+  font-size: 1rem;
+  padding: 0.65rem 1rem;
+}
+
+.checkout-primary-btn:hover {
+  background-color: #0d47a1;
+}
+
+.license-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.license-input {
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.verify-btn {
+  background-color: #eaeef2;
+  color: #1f2328;
+}
+
+.verify-btn:hover {
+  background-color: #d0d7de;
+}
+
+.paywall-status {
+  margin: 0;
+  min-height: 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.pwa-install-guide {
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin-bottom: 1rem;
+}
+
+.pwa-install-guide p {
+  margin: 0.35rem 0 0;
+}
+
+.paywall-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.close-dialog-btn {
+  background-color: #f6f8fa;
+  color: #1f2328;
+  border-color: #d0d7de;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

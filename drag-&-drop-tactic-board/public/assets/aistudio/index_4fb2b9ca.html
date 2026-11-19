@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1565c0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TacticBoard">
+  <title>Drag &amp; Drop Tactic Board</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="outside-panel" aria-label="Tactical palette outside rectangle">
+    <!-- Layer 1 (Top): Bold Title + PWA / $1.99 Unlock Controls -->
+    <section class="panel-layer layer-top">
+      <h1 class="board-title">Drag &amp; Drop Tactic Board</h1>
+      <div class="pwa-actions">
+        <button id="openPaywallBtn" type="button" class="pwa-btn pay-btn">
+          Unlock Full App ($1.99)
+        </button>
+        <button id="installPwaBtn" type="button" class="pwa-btn install-btn" hidden>
+          Install App
+        </button>
+      </div>
+    </section>
+
+    <!-- Layer 2 (Middle): The Rounds (Yellow & Red Circles + Size Radio Buttons) -->
+    <section class="panel-layer layer-middle" aria-label="Circles">
+      <!-- Yellow Circle + Size Radio Group -->
+      <div class="circle-palette-group">
+        <div class="palette-item">
+          <button
+            id="yellowTemplate"
+            type="button"
+            class="circle yellow medium"
+            data-color="yellow"
+            aria-label="Yellow circle template. Drag into the blue rectangle to add."
+          ></button>
+          <span id="yellowCount" class="count-label">0</span>
+        </div>
+
+        <fieldset class="size-fieldset">
+          <legend class="visually-hidden">Yellow circle size</legend>
+          <label class="radio-label">
+            <input type="radio" name="yellowSize" value="small">
+            Small
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="yellowSize" value="medium" checked>
+            Medium
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="yellowSize" value="large">
+            Large
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- Red Circle + Size Radio Group -->
+      <div class="circle-palette-group">
+        <div class="palette-item">
+          <button
+            id="redTemplate"
+            type="button"
+            class="circle red medium"
+            data-color="red"
+            aria-label="Red circle template. Drag into the blue rectangle to add."
+          ></button>
+          <span id="redCount" class="count-label">0</span>
+        </div>
+
+        <fieldset class="size-fieldset">
+          <legend class="visually-hidden">Red circle size</legend>
+          <label class="radio-label">
+            <input type="radio" name="redSize" value="small">
+            Small
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="redSize" value="medium" checked>
+            Medium
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="redSize" value="large">
+            Large
+          </label>
+        </fieldset>
+      </div>
+    </section>
+
+    <!-- Layer 3 (Bottom): The Lines (Horizontal & Vertical Gray Lines) -->
+    <section class="panel-layer layer-bottom" aria-label="Lines">
+      <!-- Horizontal Gray Line + Radio Group -->
+      <div class="line-palette-group">
+        <div class="palette-item">
+          <button
+            id="horizontalTemplate"
+            type="button"
+            class="line-template horizontal"
+            data-orientation="horizontal"
+            aria-label="Horizontal gray line template. Drag into the blue rectangle to add."
+          >
+            <span id="horizontalPreviewBar" class="line-bar horizontal medium"></span>
+          </button>
+          <span id="horizontalCount" class="count-label">0</span>
+        </div>
+
+        <fieldset class="thickness-fieldset">
+          <legend class="visually-hidden">Horizontal line thickness</legend>
+          <label class="radio-label">
+            <input type="radio" name="horizontalThickness" value="thin">
+            Thin
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="horizontalThickness" value="medium" checked>
+            Medium
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="horizontalThickness" value="thick">
+            Thick
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- Vertical Gray Line + Radio Group -->
+      <div class="line-palette-group">
+        <div class="palette-item">
+          <button
+            id="verticalTemplate"
+            type="button"
+            class="line-template vertical"
+            data-orientation="vertical"
+            aria-label="Vertical gray line template. Drag into the blue rectangle to add."
+          >
+            <span id="verticalPreviewBar" class="line-bar vertical medium"></span>
+          </button>
+          <span id="verticalCount" class="count-label">0</span>
+        </div>
+
+        <fieldset class="thickness-fieldset">
+          <legend class="visually-hidden">Vertical line thickness</legend>
+          <label class="radio-label">
+            <input type="radio" name="verticalThickness" value="thin">
+            Thin
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="verticalThickness" value="medium" checked>
+            Medium
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="verticalThickness" value="thick">
+            Thick
+          </label>
+        </fieldset>
+      </div>
+    </section>
+  </aside>
+
+  <main id="blueRectangle" class="blue-rectangle" aria-label="Blue tactical board rectangle"></main>
+
+  <!-- Native Modal Dialog for $1.99 Checkout & PWA Installation -->
+  <dialog id="paywallDialog" class="paywall-dialog" aria-labelledby="paywallTitle" closedby="any">
+    <h2 id="paywallTitle" class="paywall-title">Get Drag &amp; Drop Tactic Board Pro</h2>
+    <p class="paywall-price">$1.99 <span class="paywall-price-note">One-time purchase</span></p>
+    <ul class="paywall-features">
+      <li>Installable Progressive Web App on iOS, Android &amp; Desktop</li>
+      <li>Full offline device persistence + database sync</li>
+      <li>Unlimited circles and tactical lines</li>
+    </ul>
+
+    <div class="paywall-checkout-box">
+      <button id="checkoutBtn" type="button" class="pwa-btn checkout-primary-btn" autofocus>
+        Pay $1.99 &amp; Unlock Now
+      </button>
+
+      <div class="license-row">
+        <label for="licenseInput" class="visually-hidden">License code</label>
+        <input
+          id="licenseInput"
+          type="text"
+          class="license-input"
+          placeholder="Or enter license code (e.g. PRO199)"
+        >
+        <button id="verifyLicenseBtn" type="button" class="pwa-btn verify-btn">
+          Activate
+        </button>
+      </div>
+      <p id="paywallStatus" class="paywall-status" aria-live="polite"></p>
+    </div>
+
+    <div class="pwa-install-guide">
+      <strong>How to Install on Your Device:</strong>
+      <p>
+        <strong>iOS (Safari):</strong> Tap <em>Share</em> → <em>Add to Home Screen</em>.<br>
+        <strong>Android / Desktop (Chrome/Edge):</strong> Click <em>Install App</em> in the top panel or address bar.
+      </p>
+    </div>
+
+    <form method="dialog" class="paywall-footer">
+      <button value="close" class="pwa-btn close-dialog-btn">Close</button>
+    </form>
+  </dialog>
+
+  <div id="liveRegion" class="visually-hidden" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
